@@ -1,0 +1,38 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+build/
+dist/
+*.egg-info/
+
+# Testing
+.coverage
+.pytest_cache/
+htmlcov/
+
+# Virtual environments
+.venv/
+venv/
+.env
+
+# IDE and editors
+.vscode/
+.idea/
+.claude/
+.kiro/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Credentials
+.aws/
+credentials.json
+*.key
+*.pem
+
+# Logs
+*.log
