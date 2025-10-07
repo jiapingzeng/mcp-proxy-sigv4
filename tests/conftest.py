@@ -19,7 +19,7 @@ def mock_aws_credentials():
 @pytest.fixture
 def mock_boto3_session(mock_aws_credentials):
     """Mock boto3 session."""
-    with patch('boto3.Session') as mock_session:
+    with patch("boto3.Session") as mock_session:
         mock_session.return_value.get_credentials.return_value = mock_aws_credentials
         yield mock_session
 
@@ -28,17 +28,17 @@ def mock_boto3_session(mock_aws_credentials):
 def clean_env():
     """Clean environment variables for testing."""
     # Store original values
-    original_bearer_token = os.environ.get('BEARER_TOKEN')
+    original_bearer_token = os.environ.get("BEARER_TOKEN")
 
     # Clean up
-    if 'BEARER_TOKEN' in os.environ:
-        del os.environ['BEARER_TOKEN']
+    if "BEARER_TOKEN" in os.environ:
+        del os.environ["BEARER_TOKEN"]
 
     yield
 
     # Restore original values
     if original_bearer_token is not None:
-        os.environ['BEARER_TOKEN'] = original_bearer_token
+        os.environ["BEARER_TOKEN"] = original_bearer_token
 
 
 @pytest.fixture

@@ -40,10 +40,12 @@ class SigV4Auth(AWS4Auth):
                 credentials.secret_key,
                 region,
                 service,
-                session_token=credentials.token
+                session_token=credentials.token,
             )
 
-            logger.debug(f"AWS SigV4 authentication initialized for region {region}, service {service}")
+            logger.debug(
+                f"AWS SigV4 authentication initialized for region {region}, service {service}"
+            )
 
         except Exception as e:
             logger.error(f"Failed to initialize AWS credentials: {e}")
@@ -59,7 +61,7 @@ class SigV4StreamableHttpTransport(StreamableHttpTransport):
         *,
         sigv4_auth: SigV4Auth | None = None,
         timeout: float = 30.0,
-        **kwargs: Any
+        **kwargs: Any,
     ):
         if timeout and "sse_read_timeout" not in kwargs:
             kwargs["sse_read_timeout"] = timeout

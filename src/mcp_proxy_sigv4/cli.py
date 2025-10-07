@@ -106,9 +106,10 @@ def main(
 
     # Configure logging level based on verbose flag
     import logging
+
     logging.basicConfig(
         level=logging.DEBUG if verbose else logging.INFO,
-        format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+        format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
     )
 
     if verbose:

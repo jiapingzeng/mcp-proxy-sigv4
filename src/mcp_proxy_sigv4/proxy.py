@@ -58,7 +58,9 @@ class ProxyServer:
                     service=aws_service,
                     profile=aws_profile,
                 )
-                logger.info(f"SigV4 authentication initialized for region {aws_region}, service {aws_service}")
+                logger.info(
+                    f"SigV4 authentication initialized for region {aws_region}, service {aws_service}"
+                )
             except Exception as e:
                 logger.error(f"Failed to initialize SigV4 authentication: {e}")
                 raise

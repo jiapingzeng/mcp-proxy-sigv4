@@ -15,19 +15,19 @@ class TestIntegration:
 
         from mcp_proxy_sigv4.cli import main
 
-        os.environ['BEARER_TOKEN'] = 'test-env-token'
+        os.environ["BEARER_TOKEN"] = "test-env-token"
 
-        with patch('mcp_proxy_sigv4.cli.ProxyServer') as mock_proxy:
+        with patch("mcp_proxy_sigv4.cli.ProxyServer") as mock_proxy:
             mock_instance = Mock()
             mock_proxy.return_value = mock_instance
 
             runner = CliRunner()
-            runner.invoke(main, ['--endpoint', 'https://example.com/mcp'])
+            runner.invoke(main, ["--endpoint", "https://example.com/mcp"])
 
             # Should succeed and pass the env var token
             mock_proxy.assert_called_once()
             args, kwargs = mock_proxy.call_args
-            assert kwargs['bearer_token'] == 'test-env-token'
+            assert kwargs["bearer_token"] == "test-env-token"
 
     def test_aws_sigv4_integration(self, mock_boto3_session, mock_aws_credentials):
         """Test AWS SigV4 authentication integration."""
@@ -62,7 +62,7 @@ class TestIntegration:
         assert server._bearer_auth is None
         assert server._sigv4_auth is None
 
-    @patch('mcp_proxy_sigv4.proxy.StreamableHttpTransport')
+    @patch("mcp_proxy_sigv4.proxy.StreamableHttpTransport")
     def test_transport_creation_integration(self, mock_base_transport):
         """Test that different auth types create appropriate transports."""
         from mcp_proxy_sigv4.proxy import ProxyServer
@@ -75,9 +75,7 @@ class TestIntegration:
         server._create_transport()
 
         mock_base_transport.assert_called_with(
-            url="https://example.com/mcp",
-            auth="test-token",
-            sse_read_timeout=30.0
+            url="https://example.com/mcp", auth="test-token", sse_read_timeout=30.0
         )
 
     def test_cli_to_server_parameter_passing(self):
@@ -86,32 +84,43 @@ class TestIntegration:
 
         from mcp_proxy_sigv4.cli import main
 
-        with patch('mcp_proxy_sigv4.cli.ProxyServer') as mock_proxy:
+        with patch("mcp_proxy_sigv4.cli.ProxyServer") as mock_proxy:
             mock_instance = Mock()
             mock_proxy.return_value = mock_instance
 
             runner = CliRunner()
-            runner.invoke(main, [
-                '--endpoint', 'https://test.com/mcp',
-                '--aws-region', 'eu-central-1',
-                '--aws-service', 'apigateway',
-                '--aws-profile', 'test-profile',
-                '--bearer-token', 'test-jwt',
-                '--timeout', '45',
-                '--verbose'
-            ])
+            runner.invoke(
+                main,
+                [
+                    "--endpoint",
+                    "https://test.com/mcp",
+                    "--aws-region",
+                    "eu-central-1",
+                    "--aws-service",
+                    "apigateway",
+                    "--aws-profile",
+                    "test-profile",
+                    "--bearer-token",
+                    "test-jwt",
+                    "--timeout",
+                    "45",
+                    "--verbose",
+                ],
+            )
 
             mock_proxy.assert_called_once()
             args, kwargs = mock_proxy.call_args
 
-            assert kwargs['server_endpoint'] == 'https://test.com/mcp'
-            assert kwargs['aws_region'] == 'eu-central-1'
-            assert kwargs['aws_service'] == 'apigateway'
-            assert kwargs['aws_profile'] == 'test-profile'
-            assert kwargs['bearer_token'] == 'test-jwt'
-            assert kwargs['timeout'] == 45.0
-            assert kwargs['verbose'] is True
-            assert kwargs['enable_auth'] is True  # Should be True when bearer token provided
+            assert kwargs["server_endpoint"] == "https://test.com/mcp"
+            assert kwargs["aws_region"] == "eu-central-1"
+            assert kwargs["aws_service"] == "apigateway"
+            assert kwargs["aws_profile"] == "test-profile"
+            assert kwargs["bearer_token"] == "test-jwt"
+            assert kwargs["timeout"] == 45.0
+            assert kwargs["verbose"] is True
+            assert (
+                kwargs["enable_auth"] is True
+            )  # Should be True when bearer token provided
 
 
 class TestErrorHandling:
@@ -128,7 +137,7 @@ class TestErrorHandling:
         """Test handling of missing AWS credentials."""
         from mcp_proxy_sigv4.sigv4_auth import SigV4Auth
 
-        with patch('boto3.Session') as mock_session:
+        with patch("boto3.Session") as mock_session:
             mock_session.return_value.get_credentials.return_value = None
 
             with pytest.raises(ValueError, match="No AWS credentials found"):
@@ -143,11 +152,16 @@ class TestErrorHandling:
         runner = CliRunner()
 
         # Test conflicting auth options
-        result = runner.invoke(main, [
-            '--endpoint', 'https://example.com/mcp',
-            '--bearer-token', 'token',
-            '--no-auth'
-        ])
+        result = runner.invoke(
+            main,
+            [
+                "--endpoint",
+                "https://example.com/mcp",
+                "--bearer-token",
+                "token",
+                "--no-auth",
+            ],
+        )
 
         assert result.exit_code == 1
-        assert 'Cannot specify both bearer token and --no-auth' in result.output
+        assert "Cannot specify both bearer token and --no-auth" in result.output
