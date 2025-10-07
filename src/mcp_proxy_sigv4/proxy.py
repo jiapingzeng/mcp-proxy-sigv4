@@ -89,12 +89,20 @@ class ProxyServer:
         """Run the proxy server using stdio transport."""
         logger.info("Starting MCP proxy server with stdio transport")
 
+        logger.info(f"Testing connection to: {self.server_endpoint}")
+        if not await self.test_connection():
+            raise ConnectionError(
+                f"Failed to connect to remote MCP server: {self.server_endpoint}"
+            )
+
         try:
             transport = self._create_transport()
             proxy_client = ProxyClient(transport)
             proxy_server = FastMCP.as_proxy(proxy_client, name="mcp-proxy-sigv4")
 
-            logger.info(f"Proxy server created, connecting to: {self.server_endpoint}")
+            logger.info(
+                f"Connection verified, starting proxy server for: {self.server_endpoint}"
+            )
             await proxy_server.run_async("stdio")
 
         except KeyboardInterrupt:

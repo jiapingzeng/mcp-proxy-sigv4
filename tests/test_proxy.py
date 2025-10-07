@@ -149,6 +149,9 @@ class TestProxyServer:
         mock_transport = Mock()
         server._create_transport = Mock(return_value=mock_transport)
 
+        # Mock test_connection to return success
+        server.test_connection = AsyncMock(return_value=True)
+
         # Mock ProxyClient
         mock_client_instance = Mock()
         mock_proxy_client.return_value = mock_client_instance
@@ -183,11 +186,27 @@ class TestProxyServer:
         """Test exception handling in stdio run."""
         server = ProxyServer("https://example.com/mcp", enable_auth=False)
 
+        # Mock test_connection to succeed so we get to the transport creation
+        server.test_connection = AsyncMock(return_value=True)
+
         with patch.object(
             server, "_create_transport", side_effect=Exception("Test error")
         ):
             with pytest.raises(Exception, match="Test error"):
                 await server.run_stdio()
+
+    @pytest.mark.asyncio
+    async def test_run_stdio_connection_failure(self):
+        """Test stdio run when connection test fails."""
+        server = ProxyServer("https://example.com/mcp", enable_auth=False)
+
+        # Mock test_connection to return failure
+        server.test_connection = AsyncMock(return_value=False)
+
+        with pytest.raises(
+            ConnectionError, match="Failed to connect to remote MCP server"
+        ):
+            await server.run_stdio()
 
     @pytest.mark.asyncio
     @patch("mcp_proxy_sigv4.proxy.ProxyClient")
